@@ -30,7 +30,7 @@ class maverick64 {
   include mysql
   include drush
   include drupal
-
+  include apt
 }
 
 include maverick64

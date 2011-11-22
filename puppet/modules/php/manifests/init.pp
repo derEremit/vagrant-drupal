@@ -1,8 +1,20 @@
 class php {
 
   package { "php5-packages":
-    name => ["php5-common", "php5-cli", "php5-mysql", "php-apc", "php5-gd", "php5-memcache"],
+    name => ["php5-common", "php5-cli", "php5-mysql", "php-apc", "php5-gd", "php5-memcache", "php-pear"],
     ensure => present,
+  }
+
+  package { PHPUnit:
+    provider => pear,
+    ensure   => installed,
+    source   => "pear.phpunit.de/PHPUnit",
+    require => Package["php5-packages"],
+  }
+  package { APC:
+    provider => pecl,
+    ensure   => installed,
+    source   => "apc"
   }
   
   # FPM require libevent
