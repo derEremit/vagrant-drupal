@@ -4,12 +4,23 @@ class php {
     name => ["php5-common", "php5-cli", "php5-mysql", "php-apc", "php5-gd", "php5-memcache", "php-pear"],
     ensure => present,
   }
-
+  # let pear self-update
+  package { "PEAR":
+    provider => pear,
+    ensure   => latest,
+    require => Package["php5-packages"],
+  }
+  package { "phing":
+    provider => pear,
+    ensure   => installed,
+    source   => "pear.phing.info/phing",
+    require => Package["php5-packages"],
+  }
   package { PHPUnit:
     provider => pear,
     ensure   => installed,
     source   => "pear.phpunit.de/PHPUnit",
-    require => Package["php5-packages"],
+    require => [ Package["php5-packages"],Package["PEAR"] ],
   }
   package { APC:
     provider => pecl,

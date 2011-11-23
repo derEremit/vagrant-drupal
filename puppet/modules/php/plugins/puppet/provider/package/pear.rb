@@ -1,3 +1,6 @@
+# Puppet PHP PEAR Package support
+# Place file under /etc/puppet/modules/custom/plugins/puppet/provider/package/pear.rb
+
 require 'puppet/provider/package'
 
 # PHP PEAR support.
@@ -8,19 +11,11 @@ Puppet::Type.type(:package).provide :pear, :parent => Puppet::Provider::Package 
   has_feature :versionable
   has_feature :upgradeable
   
-  case Facter.value(:operatingsystem)
-  when "Solaris"
-    commands :pearcmd => "/opt/coolstack/php5/bin/pear"
-  else
-    commands :pearcmd => "pear"
-  end
+  commands :pearcmd => "pear"
 
   def self.pearlist(hash)
-    #command = [command(:pearcmd), "config-set auto_discover 1"]
-    execute(command)
-
     command = [command(:pearcmd), "list", "-a"]
-    
+
     begin
       list = execute(command).collect do |set|
         if hash[:justme]
@@ -80,15 +75,62 @@ Puppet::Type.type(:package).provide :pear, :parent => Puppet::Provider::Package 
       new(hash)
     end
   end
+  
+  def self.channellist
+    command = [command(:pearcmd), "list-channels"]
+    list = execute(command).collect do |set|
+      if channelhash = channelsplit(set)
+        channelhash
+      else
+        nil
+      end
+    end.reject { |p| p.nil? }
+    list
+  end
+  
+  def self.channelsplit(desc)
+    case desc
+    when /^Registered/: return nil
+    when /^=/: return nil
+    when /^Channel/: return nil
+    when /^\s+/: return nil
+    when /^(\S+)/
+      $1
+    else
+      Puppet.warning "Could not match %s" % desc
+      nil
+    end
+  end
 
   def install(useversion = true)
-    command = ["upgrade"]
-
+    
+    command = ["upgrade", "--force"]
+    
+    # Channel provided
     if source = @resource[:source]
+      
+      match = source.match(/^([^\/]+)(?:\/(.*))?$/)
+      
+      if match
+        channel = match[1]
+        package = match[2]
+      end
+      
+      # Check if channel is available, if not, discover
+      if match and !self.class.channellist().include?(channel)
+        execute([command(:pearcmd), "channel-discover", channel])
+      end
+      
+      # Check if package is named in source, if not, use hash and append
+      if match and (package.nil? or package.empty?) and (! @resource.should(:ensure).is_a? Symbol) and useversion
+        source = source + "/#{@resource[:name]}-#{@resource.should(:ensure)}"
+      end
+      
       command << source
+
+    # Default channel
     else
-      if (! @resource.should(:ensure).is_a? Symbol) and useversion
-#        command << "-f"
+      if (!@resource.should(:ensure).is_a? Symbol) and useversion
         command << "#{@resource[:name]}-#{@resource.should(:ensure)}"
       else
         command << @resource[:name]
@@ -126,4 +168,3 @@ Puppet::Type.type(:package).provide :pear, :parent => Puppet::Provider::Package 
     self.install(false)
   end
 end
-
