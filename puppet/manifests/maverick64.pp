@@ -31,6 +31,7 @@ class maverick64 {
   include drush
   include drupal
   include apt
+  apt::ppa { "ppa:git-core/ppa": }
 }
 
 include maverick64

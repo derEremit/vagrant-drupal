@@ -16,10 +16,10 @@ Puppet::Type.type(:package).provide :pear, :parent => Puppet::Provider::Package 
   end
 
   def self.pearlist(hash)
-    command = [command(:pearcmd), "config-set auto_discover 1"]
+    #command = [command(:pearcmd), "config-set auto_discover 1"]
     execute(command)
 
-    command = [command(:pearcmd), "list"]
+    command = [command(:pearcmd), "list", "-a"]
     
     begin
       list = execute(command).collect do |set|
@@ -60,6 +60,8 @@ Puppet::Type.type(:package).provide :pear, :parent => Puppet::Provider::Package 
     when /^INSTALLED/: return nil
     when /^=/: return nil
     when /^PACKAGE/: return nil
+    when /^$/: return nil
+    when /^\(no packages installed\)$/: return nil
     when /^(\S+)\s+([.\d]+)\s+\S+\n/
       name = $1
       version = $2
