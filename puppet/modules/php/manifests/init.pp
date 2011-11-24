@@ -10,24 +10,12 @@ class php {
     ensure   => latest,
     require => Package["php5-packages"],
   }
-  package { "phing":
-    provider => pear,
-    ensure   => installed,
-    source   => "pear.phing.info/phing",
-    require => Package["php5-packages"],
-  }
-  package { PHPUnit:
-    provider => pear,
-    ensure   => installed,
-    source   => "pear.phpunit.de/PHPUnit",
-    require => [ Package["php5-packages"],Package["PEAR"] ],
-  }
   package { APC:
     provider => pecl,
     ensure   => installed,
     source   => "apc"
   }
-  
+ 
   # FPM require libevent
   package { "libevent-1.4-2":
     alias => "libevent",
