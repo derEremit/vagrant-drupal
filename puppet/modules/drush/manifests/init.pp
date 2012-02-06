@@ -1,6 +1,6 @@
 class drush {
 
-  $version = "7.x-4.4"
+  $version = "7.x-4.5"
   $make_version = "6.x-2.1"
   
   ##
