@@ -1,4 +1,4 @@
-class maverick64 {
+class precise64{
   
   # can I move these to my Vagrant file and reference them here?
   $host = "foundation.dev"
@@ -35,4 +35,4 @@ class maverick64 {
   apt::ppa { "ppa:git-core/ppa": }
 }
 
-include maverick64
+include precise64
