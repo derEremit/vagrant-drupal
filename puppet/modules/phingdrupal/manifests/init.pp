@@ -3,13 +3,13 @@ class phingdrupal {
     provider => pear,
     ensure   => installed,
     source   => "pear.phing.info/phing",
-    require => Package["php5-packages"],
+    require => [ Package["php5-packages"],Package["PEAR"] ],
   }
   package { "PHP_PMD":
     provider => pear,
     ensure   => installed,
     source   => "pear.phpmd.org/PHP_PMD",
-    require => Package["php5-packages"],
+    require => [ Package["php5-packages"],Package["PEAR"] ],
   }
   package { PHPUnit:
     provider => pear,
