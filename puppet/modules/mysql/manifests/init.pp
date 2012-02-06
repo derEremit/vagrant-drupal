@@ -1,6 +1,6 @@
 class mysql {
 
-  $root_password = "hiaph5bat8aw"
+  $root_password = "vagrant"
   
   package { "mysql-server":
     ensure => present,
